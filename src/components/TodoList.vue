@@ -36,12 +36,12 @@
             <th>削除</th>
           </tr>
         </thead>
-        <tbody id="todo-lists-wrap">
+        <tbody id="todo-lists-wrap" >
           <tr v-for="(todo, index) in todos" :key="todo.comment">
             <td class="id">{{ index }}</td>
             <td>{{ todo.comment }}</td>
-            <td class="status-value" @click="changeStatus()">{{ todo.status }}</td>
-            <td @click="deleteComment(index)">{{ todo.deleteBtn }}</td>
+            <td class="status-value" @click="changeStatus()">{{ status }}</td>
+            <td @click="deleteComment(index)">{{ deleteBtn }}</td>
           </tr>
         </tbody>
       </table>
@@ -62,17 +62,21 @@ export default {
     return {
       value: '',
       todos: [],
-      radioValue: 'すべて',
+      status: '作業中',
+      deleteBtn: '削除',
+      radioValue: '全て',
     };
   },
   methods: {
     addComment() {
       const todo = {};
       todo.comment = this.value;
-      todo.status = '作業中',
-      todo.deleteBtn = '削除',
       this.todos.push(todo);
       this.value = '';
+      setTimeout(function(){
+        this.showStatus();
+        console.log(this)
+      }.bind(this), 0);
     },
     changeStatus() {
       if (event.target.textContent === '作業中') {
@@ -88,6 +92,7 @@ export default {
       const statusValue = document.getElementsByClassName('status-value');
       for (let i = 0; i < statusValue.length; i++) {
         const statusItem = statusValue[i];
+        console.log(statusItem.textContent);
         statusItem.parentNode.style.display = '';
         if (this.radioValue === '全て') {
           statusItem.parentNode.style.display = '';
@@ -107,3 +112,15 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+table {
+  margin: 0 auto;
+}
+
+#todo-lists-wrap {
+  height: 40px;
+
+}
+
+</style>
