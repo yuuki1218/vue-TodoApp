@@ -11,7 +11,6 @@
           name="status"
           value="全て"
           v-model="radioValue"
-          @change="showStatus"
         /><label for="all">全て</label>
         <input
           type="radio"
@@ -19,7 +18,6 @@
           name="status"
           value="作業中"
           v-model="radioValue"
-          @change="showStatus"
         /><label for="now">作業中</label>
         <input
           type="radio"
@@ -27,7 +25,6 @@
           name="status"
           value="完了"
           v-model="radioValue"
-          @change="showStatus"
         /><label for="finish">完了</label>
       </div>
       <table>
@@ -41,14 +38,11 @@
         </thead>
         <!-- 作業中・完了の表示 -->
         <tbody id="todo-lists-wrap">
-          <tr v-for="(todo, index) in todos" :key="todo.comment" v-show="radioValue === todo.status">
-            <td class="id">{{ index }}</td>
-            <td>{{ todo.comment }}</td>
-            <td class="status-value" @click="changeStatus(index)">{{ todo.status }}</td>
-            <td @click="deleteComment(index)">{{ todo.deleteBtn }}</td>
-          </tr>
-          <!-- 全ての表示 -->
-          <tr v-for="(todo, index) in todos" :key="todo.comment" v-show="radioValue === '全て'">
+          <tr
+            v-for="(todo, index) in todos"
+            :key="todo.comment"
+            v-show="radioValue === todo.status || radioValue === '全て'"
+          >
             <td class="id">{{ index }}</td>
             <td>{{ todo.comment }}</td>
             <td class="status-value" @click="changeStatus(index)">{{ todo.status }}</td>
@@ -87,7 +81,6 @@ export default {
           (todo.deleteBtn = '削除'),
           this.todos.push(todo);
         this.value = '';
-        this.showStatus();
       }
     },
     changeStatus(index) {
@@ -97,8 +90,6 @@ export default {
       } else {
         todo.status = '作業中';
       }
-      this.showStatus();
-      console.log(todo);
     },
     deleteComment(id) {
       this.todos.splice(id, 1);
