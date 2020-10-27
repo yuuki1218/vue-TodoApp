@@ -8,6 +8,7 @@
         <input
           type="radio"
           id="all"
+          name="status"
           value="全て"
           v-model="radioValue"
           @change="showStatus"
@@ -15,6 +16,7 @@
         <input
           type="radio"
           id="now"
+          name="status"
           value="作業中"
           v-model="radioValue"
           @change="showStatus"
@@ -22,6 +24,7 @@
         <input
           type="radio"
           id="finish"
+          name="status"
           value="完了"
           v-model="radioValue"
           @change="showStatus"
@@ -36,12 +39,20 @@
             <th>削除</th>
           </tr>
         </thead>
-        <tbody id="todo-lists-wrap" >
-          <tr v-for="(todo, index) in todos" :key="todo.comment">
+        <!-- 作業中・完了の表示 -->
+        <tbody id="todo-lists-wrap">
+          <tr v-for="(todo, index) in todos" :key="todo.comment" v-show="radioValue === todo.status">
             <td class="id">{{ index }}</td>
             <td>{{ todo.comment }}</td>
-            <td class="status-value" @click="changeStatus()">{{ status }}</td>
-            <td @click="deleteComment(index)">{{ deleteBtn }}</td>
+            <td class="status-value" @click="changeStatus(index)">{{ todo.status }}</td>
+            <td @click="deleteComment(index)">{{ todo.deleteBtn }}</td>
+          </tr>
+          <!-- 全ての表示 -->
+          <tr v-for="(todo, index) in todos" :key="todo.comment" v-show="radioValue === '全て'">
+            <td class="id">{{ index }}</td>
+            <td>{{ todo.comment }}</td>
+            <td class="status-value" @click="changeStatus(index)">{{ todo.status }}</td>
+            <td @click="deleteComment(index)">{{ todo.deleteBtn }}</td>
           </tr>
         </tbody>
       </table>
@@ -62,52 +73,35 @@ export default {
     return {
       value: '',
       todos: [],
-      status: '作業中',
-      deleteBtn: '削除',
       radioValue: '全て',
     };
   },
   methods: {
     addComment() {
-      const todo = {};
-      todo.comment = this.value;
-      this.todos.push(todo);
-      this.value = '';
-      setTimeout(function(){
-        this.showStatus();
-        console.log(this)
-      }.bind(this), 0);
-    },
-    changeStatus() {
-      if (event.target.textContent === '作業中') {
-        event.target.textContent = '完了';
+      if (!this.value) {
+        alert('コメントを入力してください。');
       } else {
-        event.target.textContent = '作業中';
+        const todo = {};
+        todo.comment = this.value;
+        (todo.status = '作業中'),
+          (todo.deleteBtn = '削除'),
+          this.todos.push(todo);
+        this.value = '';
+        this.showStatus();
       }
+    },
+    changeStatus(index) {
+      const todo = this.todos[index];
+      if (event.target.textContent === '作業中') {
+        todo.status = '完了';
+      } else {
+        todo.status = '作業中';
+      }
+      this.showStatus();
+      console.log(todo);
     },
     deleteComment(id) {
       this.todos.splice(id, 1);
-    },
-    showStatus() {
-      const statusValue = document.getElementsByClassName('status-value');
-      for (let i = 0; i < statusValue.length; i++) {
-        const statusItem = statusValue[i];
-        console.log(statusItem.textContent);
-        statusItem.parentNode.style.display = '';
-        if (this.radioValue === '全て') {
-          statusItem.parentNode.style.display = '';
-        } else if (
-          this.radioValue === '作業中' &&
-          statusItem.textContent === '完了'
-        ) {
-          statusItem.parentNode.style.display = 'none';
-        } else if (
-          this.radioValue === '完了' &&
-          statusItem.textContent === '作業中'
-        ) {
-          statusItem.parentNode.style.display = 'none';
-        }
-      }
     },
   },
 };
@@ -120,7 +114,5 @@ table {
 
 #todo-lists-wrap {
   height: 40px;
-
 }
-
 </style>
